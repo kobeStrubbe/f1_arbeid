@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arbeid op het circuit – fysica met Formule 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --asfalt:#15151e; --asfalt2:#24242f; --papier:#f3f3f0; --kaart:#ffffff;
+    --rood:#e63946; --blauw:#1d6fe0; --oranje:#f59e0b; --groen:#16a34a; --fout:#dc2626;
+    --tekst:#1c1c24; --zacht:#5d5d6b; --lijn:#dedee4;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Titillium Web",system-ui,sans-serif;background:var(--papier);color:var(--tekst);font-size:17px;line-height:1.5}
+  header{background:var(--asfalt);color:#fff;position:relative;overflow:hidden}
+  .vlag{height:18px;background:
+      repeating-conic-gradient(#fff 0 25%, #15151e 0 50%) 0 0/18px 18px;}
+  .hero{max-width:1080px;margin:0 auto;padding:34px 20px 30px;position:relative}
+  .hero .tag{display:inline-block;background:var(--rood);font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:3px;transform:skewX(-12deg)}
+  .hero h1{font-size:clamp(34px,6vw,58px);line-height:1;margin:14px 0 10px;font-weight:900;font-style:italic;letter-spacing:-.01em}
+  .hero h1 span{color:var(--rood)}
+  .hero p{max-width:640px;color:#c9c9d4;margin:0;font-size:18px}
+  .hero svg{position:absolute;right:10px;bottom:6px;width:360px;max-width:42%;opacity:.95}
+  nav{position:sticky;top:0;z-index:10;background:var(--asfalt2);border-bottom:3px solid var(--rood)}
+  nav .in{max-width:1080px;margin:0 auto;display:flex;gap:4px;overflow-x:auto;padding:0 12px}
+  nav a{color:#e8e8ee;text-decoration:none;font-weight:600;padding:10px 14px;white-space:nowrap;font-size:15px}
+  nav a b{color:var(--rood);margin-right:6px;font-style:italic}
+  nav a:hover{background:#ffffff14}
+  main{max-width:1080px;margin:0 auto;padding:10px 16px 60px}
+  section{padding-top:28px;scroll-margin-top:40px}
+  h2{font-size:30px;font-style:italic;font-weight:900;margin:0 0 4px;display:flex;align-items:center;gap:12px}
+  h2 .nr{background:var(--rood);color:#fff;font-size:18px;padding:2px 10px;transform:skewX(-12deg);display:inline-block}
+  .sub{color:var(--zacht);margin:0 0 16px}
+  .kaart{background:var(--kaart);border:1px solid var(--lijn);border-radius:10px;padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 2px #0000000a}
+  .formule{font-size:30px;font-weight:700;text-align:center;padding:14px;background:var(--asfalt);color:#fff;border-radius:8px;margin:6px 0 14px;letter-spacing:.02em}
+  .formule .f{color:#ff7b84}.formule .d{color:#7fb2ff}.formule .a{color:#ffc95c}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .geval{border:1px solid var(--lijn);border-radius:8px;padding:12px;text-align:center}
+  .geval h4{margin:6px 0 2px;font-size:17px}
+  .geval p{margin:0;font-size:15px;color:var(--zacht)}
+  .pos{color:var(--groen)}.neg{color:var(--fout)}.nul{color:var(--zacht)}
+  .weetje{border-left:4px solid var(--oranje);background:#fff8eb;padding:10px 14px;border-radius:0 8px 8px 0;font-size:15.5px;margin-top:12px}
+  ul.lijst{margin:6px 0 0;padding-left:20px}
+
+  /* scenario's */
+  .ronde-balk{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+  .ronde-balk button{width:38px;height:34px;border:2px solid var(--lijn);background:#fff;border-radius:6px;font-weight:700;font-family:inherit;cursor:pointer;font-size:15px}
+  .ronde-balk button.actief{border-color:var(--asfalt);background:var(--asfalt);color:#fff}
+  .ronde-balk button.klaar{border-color:var(--groen);background:#dcfce7;color:var(--groen)}
+  .ronde-balk button.klaar.actief{background:var(--groen);color:#fff}
+  .ronde-balk .score{margin-left:auto;font-weight:700;color:var(--zacht)}
+  .sc-kop{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+  .sc-kop h3{margin:0;font-size:23px;font-style:italic}
+  .circuit{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--rood)}
+  .opdracht{margin:6px 0 12px}
+  .tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .btn{font-family:inherit;font-size:15px;font-weight:700;border:2px solid var(--asfalt);background:#fff;color:var(--asfalt);padding:6px 14px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .btn:hover{background:#f0f0f4}
+  .btn.donker{background:var(--asfalt);color:#fff}
+  .btn.donker:hover{background:#2c2c3a}
+  .btn.kracht{border-color:var(--rood);color:var(--rood)}
+  .btn.kracht.aan{background:var(--rood);color:#fff}
+  .btn.verpl{border-color:var(--blauw);color:var(--blauw)}
+  .btn.verpl.aan{background:var(--blauw);color:#fff}
+  .btn.pen{border-color:#555;color:#555}
+  .btn.pen.aan{background:#555;color:#fff}
+  .btn.oranje{border-color:var(--oranje);color:#9a5d00}
+  .btn.oranje.aan{background:var(--oranje);color:#fff}
+  .btn.klein{font-size:13.5px;padding:4px 10px}
+  canvas{display:block;width:100%;height:auto;border-radius:8px;touch-action:none;cursor:crosshair;background:#fff;border:1px solid var(--lijn)}
+  .feedback{margin-top:10px;font-size:16px}
+  .feedback div{padding:6px 10px;border-radius:6px;margin-bottom:6px}
+  .ok{background:#dcfce7;color:#14532d}
+  .nok{background:#fee2e2;color:#7f1d1d}
+  .let{background:#fef3c7;color:#713f12}
+  .vragen{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  @media (max-width:720px){.vragen{grid-template-columns:1fr}}
+  .vraag{border:1px solid var(--lijn);border-radius:8px;padding:12px}
+  .vraag h4{margin:0 0 8px;font-size:16px}
+  .keuzes{display:flex;gap:8px;flex-wrap:wrap}
+  .keuzes label{border:2px solid var(--lijn);border-radius:6px;padding:4px 12px;cursor:pointer;font-weight:600}
+  .keuzes input{display:none}
+  .keuzes input:checked + span{color:var(--asfalt)}
+  .keuzes label:has(input:checked){border-color:var(--asfalt);background:#f0f0f4}
+  input[type=text]{font-family:inherit;font-size:17px;padding:5px 10px;border:2px solid var(--lijn);border-radius:6px;width:130px}
+  input[type=text]:focus{outline:none;border-color:var(--blauw)}
+  .uitleg{display:none;margin-top:12px;background:#eef4ff;border-left:4px solid var(--blauw);padding:10px 14px;border-radius:0 8px 8px 0}
+  .uitleg.toon{display:block}
+  .nav-onder{display:flex;justify-content:space-between;margin-top:14px;gap:8px;flex-wrap:wrap}
+
+  /* rekenen */
+  .reken{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:14px}
+  .rk{background:#fff;border:1px solid var(--lijn);border-radius:10px;padding:16px;display:flex;flex-direction:column}
+  .rk .kop{display:flex;justify-content:space-between;align-items:center}
+  .rk .kop span{font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--rood)}
+  .rk h4{margin:2px 0 6px;font-size:18px;font-style:italic}
+  .rk p{margin:0 0 10px;font-size:15.5px}
+  .rk .invoer{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:auto}
+  .rk .msg{font-size:15px;margin-top:8px;min-height:1px}
+  .rk .opl{display:none;font-size:15px;background:#f6f6f8;border-radius:6px;padding:8px 10px;margin-top:8px}
+  .rk .opl.toon{display:block}
+  .rk .hint{display:none;font-size:15px;color:#713f12;background:#fef3c7;border-radius:6px;padding:6px 10px;margin-top:8px}
+  .rk .hint.toon{display:block}
+  .rk.gedaan{border-color:var(--groen);box-shadow:0 0 0 2px #16a34a33}
+
+  /* labo */
+  .labo{display:grid;grid-template-columns:1fr 290px;gap:14px}
+  @media (max-width:900px){.labo{grid-template-columns:1fr}}
+  .paneel{background:#fff;border:1px solid var(--lijn);border-radius:10px;padding:14px;font-size:15.5px}
+  .paneel h4{margin:0 0 8px;font-size:17px}
+  table.res{width:100%;border-collapse:collapse;font-size:15px}
+  table.res td{padding:3px 4px;border-bottom:1px solid #eee}
+  table.res td:last-child{text-align:right;font-weight:700}
+  .totaal{font-size:20px;font-weight:900;text-align:center;padding:8px;border-radius:6px;background:#f3f3f6;margin-top:8px}
+  .schaal{font-size:13.5px;color:var(--zacht);margin-top:8px}
+  .kleuren{display:inline-flex;gap:4px;margin-left:4px}
+  .kleuren button{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #aaa;cursor:pointer}
+  .kleuren button.aan{box-shadow:0 0 0 2px var(--asfalt)}
+  .uitdaging{border:1px solid var(--lijn);border-radius:8px;padding:8px 10px;margin-bottom:6px;cursor:pointer;font-size:15px}
+  .uitdaging.aan{border-color:var(--asfalt);background:#f5f5f8}
+  .uitdaging.klaar::before{content:"✔ ";color:var(--groen);font-weight:900}
+  label.schak{display:flex;gap:6px;align-items:center;font-size:15px;cursor:pointer;margin-top:6px}
+  footer{text-align:center;color:var(--zacht);font-size:14px;padding:20px}
+  .spiek{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+  .spiek div{background:#fff;border:1px solid var(--lijn);border-radius:8px;padding:10px 12px;font-size:15.5px}
+  .spiek b{display:block;font-style:italic}
+</style>
+</head>
+<body>
+<header>
+  <div class="vlag"></div>
+  <div class="hero">
+    <h1>Arbeid op het <span>circuit</span></h1>
+    <svg viewBox="0 0 360 110" aria-hidden="true">
+      <g stroke="#ffffff30" stroke-width="3"><line x1="0" y1="60" x2="90" y2="60"/><line x1="20" y1="78" x2="100" y2="78"/><line x1="40" y1="44" x2="110" y2="44"/></g>
+      <g transform="translate(225,96) scale(1.05)">
+        <rect x="-105" y="-14" width="205" height="4" fill="#111"/>
+        <path d="M-92-14L-92-30L-55-36L-30-50L-15-50L-5-38L20-36L60-26L108-18L108-14Z" fill="#e63946"/>
+        <path d="M-70-14Q-70-28-50-28L10-28Q20-28 20-14Z" fill="#b5202c"/>
+        <rect x="-116" y="-58" width="22" height="6" fill="#222"/><rect x="-112" y="-56" width="12" height="34" fill="#333"/>
+        <rect x="90" y="-12" width="28" height="6" fill="#222"/>
+        <path d="M-14-44Q2-56 18-38" stroke="#222" stroke-width="4" fill="none"/>
+        <circle cx="0" cy="-44" r="7" fill="#ffd23f"/>
+        <circle cx="-72" cy="-15" r="15" fill="#111"/><circle cx="-72" cy="-15" r="7" fill="#888"/>
+        <circle cx="68" cy="-14" r="14" fill="#111"/><circle cx="68" cy="-14" r="6.5" fill="#888"/>
+      </g>
+    </svg>
+  </div>
+</header>
+<nav><div class="in">
+  <a href="#theorie"><b>01</b>Briefing</a>
+  <a href="#tekenen"><b>02</b>Teken de pijlen</a>
+  <a href="#labo"><b>03</b>Tekenlabo</a>
+  <a href="#spiek"><b>04</b>Spiekbriefje</a>
+</div></nav>
+
+<main>
+<!-- ================= THEORIE ================= -->
+<section id="theorie">
+  <h2><span class="nr">01</span> Briefing: wat is arbeid?</h2>
+  <p class="sub">Kort en krachtig, zoals een teambriefing voor de race.</p>
+  <div class="kaart">
+    <p style="margin-top:0">Een kracht levert <b>arbeid</b> wanneer ze een voorwerp <b>verplaatst</b>. Hoeveel arbeid hangt af van hoe groot de kracht is, hoe ver het voorwerp gaat en <b>onder welke hoek</b> de kracht staat ten opzichte van de verplaatsing.</p>
+    <div class="formule"><span>W</span> = <span class="f">F</span> · <span class="d">Δx</span> · cos <span class="a">α</span></div>
+    <ul class="lijst">
+      <li><b>W</b> = arbeid in joule (J), 1 J = 1 N·m</li>
+      <li><b style="color:var(--rood)">F</b> = grootte van de kracht in newton (N)</li>
+      <li><b style="color:var(--blauw)">Δx</b> = grootte van de verplaatsing in meter (m)</li>
+      <li><b style="color:#b37400">α</b> = hoek tussen de krachtpijl en de verplaatsingspijl</li>
+    </ul>
+  </div>
+  <div class="grid3">
+    <div class="geval">
+      <svg viewBox="0 0 200 70" width="100%" height="70"><defs>
+        <marker id="mr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#e63946"/></marker>
+        <marker id="mb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1d6fe0"/></marker></defs>
+        <line x1="40" y1="25" x2="160" y2="25" stroke="#e63946" stroke-width="5" marker-end="url(#mr)"/><text x="165" y="22" fill="#e63946" font-weight="700">F</text>
+        <line x1="40" y1="52" x2="160" y2="52" stroke="#1d6fe0" stroke-width="5" marker-end="url(#mb)"/><text x="165" y="58" fill="#1d6fe0" font-weight="700">Δx</text></svg>
+      <h4 class="pos">α &lt; 90° → W &gt; 0</h4>
+      <p>Positieve arbeid. De kracht helpt de beweging, zoals de aandrijfkracht bij het optrekken.</p>
+    </div>
+    <div class="geval">
+      <svg viewBox="0 0 200 70" width="100%" height="70">
+        <line x1="100" y1="8" x2="100" y2="44" stroke="#e63946" stroke-width="5" marker-end="url(#mr)"/><text x="108" y="30" fill="#e63946" font-weight="700">F</text>
+        <line x1="40" y1="58" x2="160" y2="58" stroke="#1d6fe0" stroke-width="5" marker-end="url(#mb)"/><text x="165" y="63" fill="#1d6fe0" font-weight="700">Δx</text></svg>
+      <h4 class="nul">α = 90° → W = 0</h4>
+      <p>Geen arbeid. Een kracht loodrecht op de verplaatsing, zoals de zwaartekracht op een vlak stuk.</p>
+    </div>
+    <div class="geval">
+      <svg viewBox="0 0 200 70" width="100%" height="70">
+        <line x1="160" y1="25" x2="40" y2="25" stroke="#e63946" stroke-width="5" marker-end="url(#mr)"/><text x="20" y="22" fill="#e63946" font-weight="700">F</text>
+        <line x1="40" y1="52" x2="160" y2="52" stroke="#1d6fe0" stroke-width="5" marker-end="url(#mb)"/><text x="165" y="58" fill="#1d6fe0" font-weight="700">Δx</text></svg>
+      <h4 class="neg">α &gt; 90° → W &lt; 0</h4>
+      <p>Negatieve arbeid. De kracht werkt de beweging tegen, zoals de remkracht of de luchtweerstand.</p>
+    </div>
+  </div>
+  <div class="weetje"><b>Let op:</b> arbeid is een <b>scalaire</b> grootheid: een getal (met teken), geen pijl. Kracht en verplaatsing zijn wél vectoren, en die ga je tekenen!</div>
+</section>
+
+<!-- ================= TEKENEN ================= -->
+<section id="tekenen">
+  <h2><span class="nr">02</span> Teken de pijlen</h2>
+  <p class="sub">Kies <b style="color:var(--rood)">Kracht</b> of <b style="color:var(--blauw)">Verplaatsing</b> en sleep met je muis of vinger over de tekening. Laat los om de pijl te plaatsen. Elke ronde = één situatie op het circuit.</p>
+  <div class="ronde-balk" id="rondeBalk"></div>
+  <div class="kaart">
+    <div class="sc-kop"><h3 id="scTitel"></h3><span class="circuit" id="scCircuit"></span></div>
+    <p class="opdracht" id="scTekst"></p>
+    <div class="tools">
+      <button class="btn kracht aan" id="tKracht">➤ Kracht <span id="tKrachtNaam" style="font-weight:400"></span></button>
+      <button class="btn verpl" id="tVerpl">➤ Verplaatsing Δx</button>
+      <button class="btn klein" id="tWis">Wis tekening</button>
+    </div>
+    <canvas id="scCanvas" width="800" height="380"></canvas>
+    <div class="tools" style="margin-top:10px">
+      <button class="btn donker" id="tCheck">Controleer mijn tekening</button>
+      <button class="btn klein" id="tHint">💡 Hint</button>
+      <button class="btn klein" id="tOpl">Toon oplossing</button>
+    </div>
+    <div class="feedback" id="scFeedback"></div>
+
+    <div class="vragen">
+      <div class="vraag">
+        <h4>1. Hoe groot is de hoek α tussen F en Δx?</h4>
+        <input type="text" id="qHoek" inputmode="decimal" placeholder="bv. 45"> °
+        <div class="feedback" id="fbHoek"></div>
+      </div>
+      <div class="vraag">
+        <h4>2. De arbeid van deze kracht is …</h4>
+        <div class="keuzes" id="qTeken">
+          <label><input type="radio" name="teken" value="pos"><span>positief</span></label>
+          <label><input type="radio" name="teken" value="nul"><span>nul</span></label>
+          <label><input type="radio" name="teken" value="neg"><span>negatief</span></label>
+        </div>
+        <div class="feedback" id="fbTeken"></div>
+      </div>
+    </div>
+    <div class="tools" style="margin-top:10px"><button class="btn donker" id="tVragen">Controleer antwoorden</button></div>
+    <div class="uitleg" id="scUitleg"></div>
+    <div class="nav-onder">
+      <button class="btn" id="tVorige">← Vorige ronde</button>
+      <button class="btn donker" id="tVolgende">Volgende ronde →</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================= LABO ================= -->
+<section id="labo">
+  <h2><span class="nr">03</span> Tekenlabo</h2>
+  <p class="sub">Experimenteer vrij! Teken krachten en een verplaatsing op het rooster: het labo meet de hoek en berekent meteen de arbeid. Met de pen kun je ook zelf dingen bijtekenen of aanduiden.</p>
+  <div class="labo">
+    <div>
+      <div class="tools">
+        <button class="btn kracht aan" data-tool="kracht">➤ Kracht</button>
+        <button class="btn verpl" data-tool="verpl">➤ Verplaatsing</button>
+        <button class="btn pen" data-tool="pen">✎ Pen</button>
+        <span class="kleuren" id="penKleuren"></span>
+        <button class="btn oranje" data-tool="wagen">🏎 Wagen plaatsen</button>
+      </div>
+      <canvas id="laboCanvas" width="880" height="480"></canvas>
+      <div class="tools" style="margin-top:8px">
+        <button class="btn klein" id="lUndo">↶ Ongedaan maken</button>
+        <button class="btn klein" id="lWis">Wis alles</button>
+        <label class="schak"><input type="checkbox" id="lComp" checked> Toon component van F langs Δx (oranje)</label>
+        <label class="schak"><input type="checkbox" id="lWagen" checked> Toon wagen</label>
+      </div>
+    </div>
+    <div>
+      <div class="paneel">
+        <h4>📊 Telemetrie</h4>
+        <div id="laboRes"></div>
+        <div class="schaal">Schaal: 1 hokje = <b style="color:var(--rood)">1000 N</b> (kracht) en <b style="color:var(--blauw)">10 m</b> (verplaatsing). Pijlen klikken vast op het rooster.</div>
+      </div>
+      <div class="paneel" style="margin-top:12px">
+        <h4>🏁 Uitdagingen</h4>
+        <div id="uitdagingen"></div>
+        <button class="btn donker" id="lCheck" style="margin-top:6px">Controleer uitdaging</button>
+        <div class="feedback" id="lFb"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SPIEK ================= -->
+<section id="spiek">
+  <h2><span class="nr">04</span> Spiekbriefje</h2>
+  <p class="sub">Alles wat je moet onthouden, in één oogopslag.</p>
+  <div class="spiek">
+    <div><b>Formule</b>W = F · Δx · cos α, in joule (J).</div>
+    <div><b>Drie voorwaarden</b>Er is een kracht, er is een verplaatsing en de kracht staat niet loodrecht op de verplaatsing.</div>
+    <div><b>Hoek α</b>Altijd tussen de pijl van F en de pijl van Δx, met beide pijlen vanuit hetzelfde punt gedacht.</div>
+    <div><b>Teken</b>α &lt; 90°: W &gt; 0 · α = 90°: W = 0 · α &gt; 90°: W &lt; 0</div>
+    <div><b>Enkel de component telt</b>Alleen het stuk van F langs Δx (F · cos α) levert arbeid.</div>
+    <div><b>Eenheden</b>1 kJ = 1000 J · 1 MJ = 1 000 000 J · 1 km = 1000 m</div>
+  </div>
+</section>
+</main>
+<footer>🏁 Arbeid op het circuit</footer>
+
+<script>
+/* ---------- hulpfuncties ---------- */
+const RAD = Math.PI/180;
+const $ = id => document.getElementById(id);
+function hoekVan(x1,y1,x2,y2){ let a = Math.atan2(-(y2-y1), x2-x1)/RAD; return (a+360)%360; }
+function hoekVerschil(a,b){ return Math.abs(((a-b+540)%360)-180); }
+function leesGetal(s){ if(s==null) return NaN; s=String(s).trim().replace(/\s/g,'').replace(/−/g,'-').replace(',', '.'); if(s==='') return NaN; return Number(s); }
+function fmt(n,d=0){ return n.toLocaleString('nl-BE',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function canvasPunt(cv,e){ const r=cv.getBoundingClientRect(); return {x:(e.clientX-r.left)*cv.width/r.width, y:(e.clientY-r.top)*cv.height/r.height}; }
+
+function pijl(ctx,x1,y1,x2,y2,kleur,dikte=5,label=null,gestippeld=false){
+  const a=Math.atan2(y2-y1,x2-x1), L=Math.hypot(x2-x1,y2-y1); if(L<2) return;
+  const kop=Math.min(18,L*0.45);
+  ctx.save(); ctx.strokeStyle=kleur; ctx.fillStyle=kleur; ctx.lineWidth=dikte; ctx.lineCap='round';
+  if(gestippeld) ctx.setLineDash([9,7]);
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2-Math.cos(a)*kop*0.8, y2-Math.sin(a)*kop*0.8); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-kop*Math.cos(a-0.42), y2-kop*Math.sin(a-0.42));
+  ctx.lineTo(x2-kop*Math.cos(a+0.42), y2-kop*Math.sin(a+0.42)); ctx.closePath(); ctx.fill();
+  if(label){ ctx.font='italic 700 20px "Titillium Web",sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lx=x2+Math.cos(a)*16 - Math.sin(a)*14, ly=y2+Math.sin(a)*16 + Math.cos(a)*14;
+    ctx.lineWidth=4; ctx.strokeStyle='#fff'; ctx.strokeText(label,lx,ly); ctx.fillText(label,lx,ly); }
+  ctx.restore();
+}
+
+/* F1-wagen in zijaanzicht, wielen op y=0, neus naar rechts */
+function tekenWagen(ctx,x,y,schaal=1,helling=0,opties={}){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(-helling*RAD); ctx.scale(schaal,schaal);
+  ctx.fillStyle='#111'; ctx.fillRect(-105,-14,205,4);
+  ctx.fillStyle='#e63946'; ctx.beginPath();
+  [[-92,-14],[-92,-30],[-55,-36],[-30,-50],[-15,-50],[-5,-38],[20,-36],[60,-26],[108,-18],[108,-14]].forEach((p,i)=> i?ctx.lineTo(...p):ctx.moveTo(...p));
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#b5202c'; ctx.beginPath(); ctx.moveTo(-70,-14); ctx.quadraticCurveTo(-70,-28,-50,-28); ctx.lineTo(10,-28); ctx.quadraticCurveTo(20,-28,20,-14); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.font='italic 900 13px "Titillium Web",sans-serif'; ctx.textAlign='center'; ctx.fillText('4',-25,-17);
+  ctx.fillStyle='#222'; ctx.fillRect(-116,-58,22,6); ctx.fillStyle='#333'; ctx.fillRect(-112,-56,12,34);
+  ctx.fillStyle='#222'; ctx.fillRect(90,-12,28,6); ctx.fillRect(114,-18,4,12);
+  ctx.strokeStyle='#222'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(-14,-44); ctx.quadraticCurveTo(2,-56,18,-38); ctx.stroke();
+  ctx.fillStyle='#ffd23f'; ctx.beginPath(); ctx.arc(0,-44,7,0,7); ctx.fill();
+  [[-72,-15,15],[68,-14,14]].forEach(([wx,wy,r])=>{
+    ctx.fillStyle='#111'; ctx.beginPath(); ctx.arc(wx,wy,r,0,7); ctx.fill();
+    ctx.fillStyle=opties.rem?'#ff7a1a':'#8a8a8a'; ctx.beginPath(); ctx.arc(wx,wy,r*0.47,0,7); ctx.fill();
+    if(opties.rem){ ctx.fillStyle='#ffd27a'; ctx.beginPath(); ctx.arc(wx,wy,r*0.22,0,7); ctx.fill(); }
+  });
+  ctx.restore();
+}
+
+/* ================= SCENARIO'S ================= */
+const SC = [
+ {titel:'Start! De lichten doven', circuit:'Startgrid · elk circuit', krachtNaam:'(aandrijfkracht)',
+  tekst:'De vijf rode lichten doven en de wagen trekt op naar rechts. Teken de <b>aandrijfkracht</b> (de weg duwt via de banden de wagen vooruit) en de <b>verplaatsing</b> van de wagen.',
+  F:0, D:0, helling:0, alfa:0, teken:'pos', extra:'snelheid',
+  hintF:'In welke richting wordt de wagen geduwd als hij sneller gaat?', hintD:'De wagen rijdt naar rechts.',
+  uitleg:'F en Δx wijzen allebei naar rechts, dus α = 0° en cos 0° = 1. De aandrijfkracht levert <b>positieve arbeid</b>: ze geeft de wagen energie, waardoor hij sneller gaat.'},
+ {titel:'Hard remmen voor de haarspeldbocht', circuit:'Monaco · Fairmont-haarspeld', krachtNaam:'(remkracht)',
+  tekst:'De wagen rijdt naar rechts en remt keihard voor de traagste bocht van het seizoen. Teken de <b>remkracht</b> (wrijving van de weg op de banden) en de <b>verplaatsing</b>.',
+  F:180, D:0, helling:0, alfa:180, teken:'neg', extra:'rem',
+  hintF:'Een remkracht werkt de beweging tegen.', hintD:'Ook tijdens het remmen rijdt de wagen nog steeds naar rechts!',
+  uitleg:'De remkracht wijst naar links, de verplaatsing naar rechts: α = 180° en cos 180° = −1. De remkracht levert <b>negatieve arbeid</b>: ze haalt bewegingsenergie weg. Die energie wordt warmte; daarom gloeien de remschijven oranje (tot meer dan 1000 °C!).'},
+ {titel:'Zwaartekracht op het rechte stuk', circuit:'Monza · hoofdrechte', krachtNaam:'(zwaartekracht)',
+  tekst:'Op de vlakke hoofdrechte rijdt de wagen (m ≈ 800 kg) naar rechts. Teken de <b>zwaartekracht</b> op de wagen en de <b>verplaatsing</b>.',
+  F:270, D:0, helling:0, alfa:90, teken:'nul', extra:'massa',
+  hintF:'De zwaartekracht wijst altijd naar het middelpunt van de aarde.', hintD:'Op een vlakke rechte lijn gaat de wagen horizontaal.',
+  uitleg:'De zwaartekracht wijst verticaal naar beneden, de verplaatsing is horizontaal: α = 90° en cos 90° = 0. De zwaartekracht levert hier <b>geen arbeid</b>: de wagen gaat niet hoger of lager.'},
+ {titel:'Downforce: tegen de grond gedrukt', circuit:'Silverstone · Maggotts-Becketts', krachtNaam:'(downforce)',
+  tekst:'De vleugels buigen de luchtstroom naar boven af, waardoor de lucht de wagen tegen de weg drukt: <b>downforce</b>. De wagen rijdt naar rechts. Teken de downforce en de verplaatsing.',
+  F:270, D:0, helling:0, alfa:90, teken:'nul', extra:'lucht',
+  hintF:'"Down"force: de wagen wordt tegen het asfalt gedrukt.', hintD:'Horizontaal naar rechts.',
+  uitleg:'Downforce staat loodrecht op de verplaatsing (α = 90°), dus <b>W = 0</b>. Ze levert zelf geen arbeid, maar zorgt wel voor meer grip zodat de wagen sneller door de bocht kan. Een kracht kan dus nuttig zijn zonder arbeid te leveren!'},
+ {titel:'Luchtweerstand op de lange rechte', circuit:'Spa-Francorchamps · Kemmel', krachtNaam:'(luchtweerstand)',
+  tekst:'Aan meer dan 320 km/h rijdt de wagen naar rechts door de lucht. Teken de <b>luchtweerstand</b> op de wagen en de <b>verplaatsing</b>.',
+  F:180, D:0, helling:0, alfa:180, teken:'neg', extra:'wind',
+  hintF:'De lucht botst tegen de voorkant van de wagen.', hintD:'Naar rechts.',
+  uitleg:'Luchtweerstand werkt tegen de beweging in: α = 180°, dus <b>negatieve arbeid</b>. Met DRS (de achtervleugel klapt open) wordt de luchtweerstand kleiner, dus de negatieve arbeid ook. Zo kan de wagen inhalen.'},
+ {titel:'Bergop door Eau Rouge en Raidillon', circuit:'Spa-Francorchamps · Raidillon', krachtNaam:'(zwaartekracht)',
+  tekst:'De wagen rijdt de steile helling op naar rechts (de helling van 22° is overdreven getekend). Teken de <b>zwaartekracht</b> en de <b>verplaatsing langs de weg</b>.',
+  F:270, D:22, helling:22, alfa:112, teken:'neg', extra:'helling',
+  hintF:'Ook op een helling wijst de zwaartekracht recht naar beneden, niet loodrecht op de weg!', hintD:'De wagen volgt de weg schuin omhoog.',
+  uitleg:'De verplaatsing gaat 22° omhoog, de zwaartekracht verticaal omlaag. De hoek tussen de pijlen is α = 90° + 22° = 112°. Omdat cos 112° &lt; 0 levert de zwaartekracht <b>negatieve arbeid</b>: de motor moet extra hard werken om de wagen omhoog te krijgen.'},
+ {titel:'Bergaf naar Pouhon', circuit:'Spa-Francorchamps · afdaling', krachtNaam:'(zwaartekracht)',
+  tekst:'Nu rijdt de wagen een helling af naar rechts (20°, overdreven getekend). Teken de <b>zwaartekracht</b> en de <b>verplaatsing langs de weg</b>.',
+  F:270, D:340, helling:-20, alfa:70, teken:'pos', extra:'helling',
+  hintF:'De zwaartekracht wijst nog steeds verticaal naar beneden.', hintD:'De wagen volgt de weg schuin naar beneden.',
+  uitleg:'De verplaatsing wijst 20° naar beneden, de zwaartekracht 90° naar beneden: α = 90° − 20° = 70°. cos 70° &gt; 0, dus <b>positieve arbeid</b>: de zwaartekracht helpt de wagen versnellen.'},
+ {titel:'Met het sleeptouw naar de garage', circuit:'Pitstraat · na de training', krachtNaam:'(trekkracht)',
+  tekst:'Een mechanieker trekt de wagen met een touw dat 30° schuin omhoog staat. De wagen rolt horizontaal naar rechts. Teken de <b>trekkracht van het touw</b> op de wagen en de <b>verplaatsing</b>.',
+  F:30, D:0, helling:0, alfa:30, teken:'pos', extra:'touw',
+  hintF:'Een touw trekt altijd langs het touw.', hintD:'De wagen gaat niet omhoog, hij rolt horizontaal.',
+  uitleg:'Het touw trekt onder 30°, de wagen gaat horizontaal: α = 30°. Alleen de horizontale component F · cos 30° ≈ 0,87 · F levert arbeid. De arbeid is <b>positief</b>, maar kleiner dan wanneer de mechanieker horizontaal zou trekken.'}
+];
+const TOL = 15;
+const AX = 400, AY = 250; // ankerpunt wagen
+
+let rIdx = 0, scTool = 'kracht', scPijlen = {kracht:null, verpl:null}, sleep = null, toonOpl = false;
+const scKlaar = SC.map(()=>({teken:false, vragen:false}));
+const cv = $('scCanvas'), ctx = cv.getContext('2d');
+
+function bouwBalk(){
+  const b=$('rondeBalk'); b.innerHTML='';
+  SC.forEach((s,i)=>{ const k=document.createElement('button'); k.textContent=i+1; k.title=s.titel;
+    if(i===rIdx) k.classList.add('actief'); if(scKlaar[i].teken&&scKlaar[i].vragen) k.classList.add('klaar');
+    k.onclick=()=>laadRonde(i); b.appendChild(k); });
+  const n=scKlaar.filter(k=>k.teken&&k.vragen).length;
+  const s=document.createElement('span'); s.className='score'; s.textContent=`🏁 ${n}/${SC.length} rondes voltooid`; b.appendChild(s);
+}
+
+function laadRonde(i){
+  rIdx=i; const s=SC[i]; scPijlen={kracht:null,verpl:null}; toonOpl=false;
+  $('scTitel').textContent=`Ronde ${i+1} · ${s.titel}`; $('scCircuit').textContent=s.circuit;
+  $('scTekst').innerHTML=s.tekst; $('tKrachtNaam').textContent=s.krachtNaam;
+  $('scFeedback').innerHTML=''; $('fbHoek').innerHTML=''; $('fbTeken').innerHTML='';
+  $('qHoek').value=''; document.querySelectorAll('input[name=teken]').forEach(r=>r.checked=false);
+  $('scUitleg').className='uitleg'; $('scUitleg').innerHTML='';
+  zetScTool('kracht'); bouwBalk(); tekenScene();
+}
+
+function wereld(lx,ly,h){ const c=Math.cos(-h*RAD), s=Math.sin(-h*RAD); return {x:AX+lx*c-ly*s, y:AY+lx*s+ly*c}; }
+function lokaal(x,y,h){ const dx=x-AX, dy=y-AY, c=Math.cos(h*RAD), s=Math.sin(h*RAD); return {x:dx*c-dy*s, y:dx*s+dy*c}; }
+
+function tekenScene(){
+  const s=SC[rIdx], W=cv.width, H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#cfe6fb'); g.addColorStop(1,'#eef6fd'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  // heuvels
+  ctx.fillStyle='#bfdcae'; ctx.beginPath(); ctx.moveTo(0,200); ctx.quadraticCurveTo(200,140,420,190); ctx.quadraticCurveTo(620,230,800,170); ctx.lineTo(800,H); ctx.lineTo(0,H); ctx.fill();
+  // weg
+  ctx.save(); ctx.translate(AX,AY); ctx.rotate(-s.helling*RAD);
+  ctx.fillStyle='#6fae5a'; ctx.fillRect(-1200,14,2400,400);
+  ctx.fillStyle='#3a3a44'; ctx.fillRect(-1200,-34,2400,40);
+  for(let x=-1200;x<1200;x+=40){ ctx.fillStyle=((x/40)%2===0)?'#e63946':'#fff'; ctx.fillRect(x,6,40,8); }
+  ctx.strokeStyle='#ffffffaa'; ctx.lineWidth=3; ctx.setLineDash([30,24]); ctx.beginPath(); ctx.moveTo(-1200,-18); ctx.lineTo(1200,-18); ctx.stroke(); ctx.setLineDash([]);
+  ctx.restore();
+
+  // extra's
+  ctx.save();
+  if(s.extra==='snelheid'){ ctx.strokeStyle='#ffffffcc'; ctx.lineWidth=4; ctx.lineCap='round';
+    [[150,205,250],[120,225,260],[170,240,265]].forEach(([a,y,b])=>{ctx.beginPath();ctx.moveTo(a,y);ctx.lineTo(b,y);ctx.stroke();});
+    // startlichten
+    ctx.fillStyle='#222'; ctx.fillRect(60,30,170,40); for(let i=0;i<5;i++){ ctx.fillStyle='#444'; ctx.beginPath(); ctx.arc(80+i*32,50,11,0,7); ctx.fill(); }
+    ctx.fillStyle='#333'; ctx.font='700 13px "Titillium Web",sans-serif'; ctx.fillText('lichten uit: GO!',90,88);
+  }
+  if(s.extra==='rem'){ ctx.fillStyle='#ffffffaa'; [[250,240,14],[230,232,10],[212,244,8],[390,242,10],[372,236,7]].forEach(([x,y,r])=>{ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();});
+    ctx.fillStyle='#fff'; ctx.strokeStyle='#222'; ctx.lineWidth=2; ctx.fillRect(660,120,70,50); ctx.strokeRect(660,120,70,50);
+    ctx.fillStyle='#222'; ctx.font='900 30px "Titillium Web",sans-serif'; ctx.textAlign='center'; ctx.fillText('100',695,156); ctx.fillRect(693,170,4,80);
+  }
+  if(s.extra==='massa'){ ctx.fillStyle='#1c1c24'; ctx.font='700 16px "Titillium Web",sans-serif'; ctx.fillText('m ≈ 800 kg', 365, 165); }
+  if(s.extra==='lucht'){ ctx.strokeStyle='#2b9bd1'; ctx.lineWidth=2.5; ctx.setLineDash([6,6]);
+    [[-60],[-75]].forEach(([dy],i)=>{ ctx.beginPath(); ctx.moveTo(560,AY+dy-10*i); ctx.bezierCurveTo(460,AY+dy-10*i,340,AY-70-12*i,260,AY-110-14*i); ctx.stroke(); });
+    ctx.setLineDash([]); ctx.fillStyle='#2b9bd1'; ctx.font='700 14px "Titillium Web",sans-serif'; ctx.fillText('lucht wordt omhoog afgebogen',210,90); }
+  if(s.extra==='wind'){ ctx.strokeStyle='#7fb2ffcc'; ctx.lineWidth=3; ctx.lineCap='round';
+    [[560,700,190],[580,740,215],[555,690,235],[600,760,170]].forEach(([a,b,y])=>{ctx.beginPath();ctx.moveTo(a,y);ctx.lineTo(b,y);ctx.stroke();});
+    ctx.fillStyle='#4a7fd0'; ctx.font='700 14px "Titillium Web",sans-serif'; ctx.fillText('lucht',640,150); }
+  if(s.extra==='helling'){ ctx.fillStyle='#1c1c24'; ctx.font='italic 600 14px "Titillium Web",sans-serif'; ctx.fillText(`helling ${Math.abs(s.helling)}° (overdreven getekend)`, 20, 30); }
+  if(s.extra==='touw'){ const n=wereld(112,-20,0); const L=150; const hx=n.x+L*Math.cos(30*RAD), hy=n.y-L*Math.sin(30*RAD);
+    ctx.strokeStyle='#8b5a2b'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(n.x,n.y); ctx.lineTo(hx,hy); ctx.stroke();
+    // mechanieker
+    const fx=hx+28; ctx.strokeStyle='#1d3557'; ctx.lineWidth=7; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(fx,AY); ctx.lineTo(fx+8,AY-40); ctx.lineTo(fx+22,AY); ctx.moveTo(fx+8,AY-40); ctx.lineTo(fx+12,AY-82); ctx.stroke();
+    ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(fx+12,AY-74); ctx.lineTo(hx,hy); ctx.stroke();
+    ctx.fillStyle='#f1c27d'; ctx.beginPath(); ctx.arc(fx+14,AY-96,11,0,7); ctx.fill();
+    ctx.fillStyle='#1d3557'; ctx.beginPath(); ctx.arc(fx+14,AY-100,11,Math.PI,0); ctx.fill();
+    ctx.fillStyle='#1c1c24'; ctx.font='italic 600 14px "Titillium Web",sans-serif'; ctx.fillText('touw: 30° boven de horizontale', 470, 70);
+  }
+  ctx.restore();
+
+  tekenWagen(ctx,AX,AY,1,s.helling,{rem:s.extra==='rem'});
+
+  // oplossing
+  if(toonOpl){
+    const c=wereld(0,-30,s.helling), L=120;
+    ctx.globalAlpha=.55;
+    pijl(ctx,c.x,c.y,c.x+L*Math.cos(s.F*RAD),c.y-L*Math.sin(s.F*RAD),'#e63946',5,'F',true);
+    const d=wereld(-60,30,s.helling);
+    pijl(ctx,d.x,d.y,d.x+140*Math.cos(s.D*RAD),d.y-140*Math.sin(s.D*RAD),'#1d6fe0',5,'Δx',true);
+    ctx.globalAlpha=1;
+  }
+  if(scPijlen.verpl){ const p=scPijlen.verpl; pijl(ctx,p.x1,p.y1,p.x2,p.y2,'#1d6fe0',6,'Δx'); }
+  if(scPijlen.kracht){ const p=scPijlen.kracht; pijl(ctx,p.x1,p.y1,p.x2,p.y2,'#e63946',6,'F'); ctx.fillStyle='#e63946'; ctx.beginPath(); ctx.arc(p.x1,p.y1,5,0,7); ctx.fill(); }
+  if(sleep){ pijl(ctx,sleep.x1,sleep.y1,sleep.x2,sleep.y2, sleep.type==='kracht'?'#e6394699':'#1d6fe099',6); }
+}
+
+function zetScTool(t){ scTool=t; $('tKracht').classList.toggle('aan',t==='kracht'); $('tVerpl').classList.toggle('aan',t==='verpl'); }
+$('tKracht').onclick=()=>zetScTool('kracht'); $('tVerpl').onclick=()=>zetScTool('verpl');
+$('tWis').onclick=()=>{ scPijlen={kracht:null,verpl:null}; $('scFeedback').innerHTML=''; tekenScene(); };
+
+cv.addEventListener('pointerdown',e=>{ const p=canvasPunt(cv,e); sleep={type:scTool,x1:p.x,y1:p.y,x2:p.x,y2:p.y}; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove',e=>{ if(!sleep) return; const p=canvasPunt(cv,e); sleep.x2=p.x; sleep.y2=p.y; tekenScene(); });
+cv.addEventListener('pointerup',()=>{ if(!sleep) return; const s=sleep; sleep=null;
+  if(Math.hypot(s.x2-s.x1,s.y2-s.y1)>=25){ scPijlen[s.type]={...s};
+    if(s.type==='kracht' && !scPijlen.verpl) zetScTool('verpl'); }
+  tekenScene(); });
+
+$('tCheck').onclick=()=>{
+  const s=SC[rIdx], fb=$('scFeedback'), out=[];
+  const f=scPijlen.kracht, d=scPijlen.verpl;
+  let fOk=false,dOk=false;
+  if(!f) out.push(['nok','Je hebt nog geen <b>krachtpijl</b> getekend.']);
+  else { fOk = hoekVerschil(hoekVan(f.x1,f.y1,f.x2,f.y2), s.F) <= TOL;
+    out.push(fOk?['ok','✔ Krachtpijl: juiste richting!']:['nok','✘ Krachtpijl: de richting klopt nog niet. '+s.hintF]);
+    const l=lokaal(f.x1,f.y1,s.helling);
+    if(fOk && !(l.x>-130 && l.x<130 && l.y>-75 && l.y<15)) out.push(['let','⚠ Richting is goed, maar laat de krachtpijl liefst <b>op de wagen</b> beginnen (het aangrijpingspunt).']);
+  }
+  if(!d) out.push(['nok','Je hebt nog geen <b>verplaatsingspijl</b> getekend.']);
+  else { dOk = hoekVerschil(hoekVan(d.x1,d.y1,d.x2,d.y2), s.D) <= TOL;
+    out.push(dOk?['ok','✔ Verplaatsingspijl: juiste richting!']:['nok','✘ Verplaatsingspijl: kijk nog eens. '+s.hintD]); }
+  if(fOk&&dOk){ const gemeten = hoekVerschil(hoekVan(f.x1,f.y1,f.x2,f.y2), hoekVan(d.x1,d.y1,d.x2,d.y2));
+    out.push(['ok',`🏁 Perfecte tekening! Tussen jouw twee pijlen meet ik een hoek van ongeveer ${Math.round(gemeten)}°.`]); scKlaar[rIdx].teken=true; }
+  fb.innerHTML=out.map(([c,t])=>`<div class="${c}">${t}</div>`).join('');
+  bouwBalk(); toonUitlegAls();
+};
+$('tHint').onclick=()=>{ const s=SC[rIdx]; $('scFeedback').innerHTML=`<div class="let">💡 <b>Kracht:</b> ${s.hintF}<br>💡 <b>Verplaatsing:</b> ${s.hintD}</div>`; };
+$('tOpl').onclick=()=>{ toonOpl=!toonOpl; $('tOpl').textContent=toonOpl?'Verberg oplossing':'Toon oplossing'; tekenScene(); if(toonOpl){ $('scUitleg').innerHTML='<b>Uitleg:</b> '+SC[rIdx].uitleg; $('scUitleg').className='uitleg toon'; } };
+
+$('tVragen').onclick=()=>{
+  const s=SC[rIdx]; const h=leesGetal($('qHoek').value);
+  let hOk=false;
+  if(isNaN(h)) $('fbHoek').innerHTML='<div class="nok">Vul een getal in.</div>';
+  else if(Math.abs(h-s.alfa)<=3){ hOk=true; $('fbHoek').innerHTML=`<div class="ok">✔ Juist, α = ${s.alfa}°.</div>`; }
+  else if(s.helling!==0 && (Math.abs(h-Math.abs(s.helling))<=3 || Math.abs(h-90)<=3)) $('fbHoek').innerHTML='<div class="nok">✘ Bijna. Denk aan de hoek tussen de <b>twee pijlen</b>, niet tussen de weg en de horizontale. Hoeveel graden is het van "recht omlaag" tot de richting van de weg?</div>';
+  else if(Math.abs(h-(360-s.alfa))<=3) $('fbHoek').innerHTML='<div class="nok">✘ Je nam de "buitenhoek". α ligt altijd tussen 0° en 180°.</div>';
+  else $('fbHoek').innerHTML='<div class="nok">✘ Nog niet juist. Denk beide pijlen vanuit hetzelfde punt en meet de hoek ertussen.</div>';
+  const t=document.querySelector('input[name=teken]:checked'); let tOk=false;
+  if(!t) $('fbTeken').innerHTML='<div class="nok">Kies een antwoord.</div>';
+  else if(t.value===s.teken){ tOk=true; $('fbTeken').innerHTML='<div class="ok">✔ Juist!</div>'; }
+  else $('fbTeken').innerHTML='<div class="nok">✘ Niet juist. Kijk naar α: kleiner dan, gelijk aan of groter dan 90°?</div>';
+  if(hOk&&tOk) scKlaar[rIdx].vragen=true;
+  bouwBalk(); toonUitlegAls();
+};
+function toonUitlegAls(){ const k=scKlaar[rIdx]; if(k.teken&&k.vragen){ $('scUitleg').innerHTML='🏆 <b>Ronde voltooid!</b> '+SC[rIdx].uitleg; $('scUitleg').className='uitleg toon'; } }
+$('tVorige').onclick=()=>laadRonde((rIdx-1+SC.length)%SC.length);
+$('tVolgende').onclick=()=>laadRonde((rIdx+1)%SC.length);
+laadRonde(0);
+
+/* ================= LABO ================= */
+const lc=$('laboCanvas'), lx=lc.getContext('2d'), G=40;
+let lTool='kracht', items=[], lSleep=null, wagenPos={x:240,y:280}, penKleur='#1c1c24';
+const PEN=['#1c1c24','#16a34a','#7c3aed','#f59e0b'];
+const pk=$('penKleuren');
+PEN.forEach((k,i)=>{ const b=document.createElement('button'); b.style.background=k; if(i===0) b.classList.add('aan');
+  b.onclick=()=>{ penKleur=k; pk.querySelectorAll('button').forEach(x=>x.classList.remove('aan')); b.classList.add('aan'); zetLTool('pen'); }; pk.appendChild(b); });
+function zetLTool(t){ lTool=t; document.querySelectorAll('#labo [data-tool]').forEach(b=>b.classList.toggle('aan',b.dataset.tool===t)); lc.style.cursor=t==='wagen'?'move':'crosshair'; }
+document.querySelectorAll('#labo [data-tool]').forEach(b=>b.onclick=()=>zetLTool(b.dataset.tool));
+const snap=v=>Math.round(v/G)*G;
+const krachten=()=>items.filter(i=>i.k==='kracht');
+const verpl=()=>items.find(i=>i.k==='verpl');
+
+function tekenLabo(){
+  const W=lc.width,H=lc.height; lx.clearRect(0,0,W,H); lx.fillStyle='#fff'; lx.fillRect(0,0,W,H);
+  lx.strokeStyle='#e7e9ef'; lx.lineWidth=1;
+  for(let x=0;x<=W;x+=G){ lx.beginPath(); lx.moveTo(x+.5,0); lx.lineTo(x+.5,H); lx.stroke(); }
+  for(let y=0;y<=H;y+=G){ lx.beginPath(); lx.moveTo(0,y+.5); lx.lineTo(W,y+.5); lx.stroke(); }
+  if($('lWagen').checked){ lx.fillStyle='#3a3a4422'; lx.fillRect(0,wagenPos.y,W,6); tekenWagen(lx,wagenPos.x,wagenPos.y,0.8,0); }
+  items.filter(i=>i.k==='pen').forEach(s=>{ lx.strokeStyle=s.kleur; lx.lineWidth=3; lx.lineCap='round'; lx.lineJoin='round'; lx.beginPath(); s.p.forEach((q,j)=>j?lx.lineTo(q.x,q.y):lx.moveTo(q.x,q.y)); lx.stroke(); });
+  const d=verpl();
+  if(d) pijl(lx,d.x1,d.y1,d.x2,d.y2,'#1d6fe0',6,'Δx');
+  krachten().forEach((f,i)=>{
+    if(d && $('lComp').checked){
+      const dx=d.x2-d.x1, dy=d.y2-d.y1, L=Math.hypot(dx,dy), ux=dx/L, uy=dy/L;
+      const fx=f.x2-f.x1, fy=f.y2-f.y1, p=fx*ux+fy*uy;
+      const px=f.x1+p*ux, py=f.y1+p*uy;
+      lx.save(); lx.strokeStyle='#999'; lx.setLineDash([5,5]); lx.lineWidth=1.5; lx.beginPath(); lx.moveTo(f.x2,f.y2); lx.lineTo(px,py); lx.stroke(); lx.restore();
+      if(Math.abs(p)>3) pijl(lx,f.x1,f.y1,px,py,'#f59e0b',4);
+    }
+    pijl(lx,f.x1,f.y1,f.x2,f.y2,'#e63946',6,'F'+sub(i+1));
+  });
+  if(lSleep){ if(lSleep.k==='pen'){ lx.strokeStyle=lSleep.kleur; lx.lineWidth=3; lx.beginPath(); lSleep.p.forEach((q,j)=>j?lx.lineTo(q.x,q.y):lx.moveTo(q.x,q.y)); lx.stroke(); }
+    else pijl(lx,lSleep.x1,lSleep.y1,lSleep.x2,lSleep.y2,lSleep.k==='kracht'?'#e6394699':'#1d6fe099',6); }
+  resultaten();
+}
+function sub(n){ return String(n).split('').map(c=>'₀₁₂₃₄₅₆₇₈₉'[+c]).join(''); }
+function analyse(){
+  const d=verpl(); const res={d:null,f:[]};
+  if(d){ res.d={cel:Math.hypot(d.x2-d.x1,d.y2-d.y1)/G, rich:hoekVan(d.x1,d.y1,d.x2,d.y2)}; res.d.m=res.d.cel*10; }
+  krachten().forEach(f=>{ const cel=Math.hypot(f.x2-f.x1,f.y2-f.y1)/G; const r={cel,N:cel*1000,rich:hoekVan(f.x1,f.y1,f.x2,f.y2)};
+    if(d){ const fx=f.x2-f.x1,fy=f.y2-f.y1,dx=d.x2-d.x1,dy=d.y2-d.y1; let c=(fx*dx+fy*dy)/(Math.hypot(fx,fy)*Math.hypot(dx,dy)); c=Math.max(-1,Math.min(1,c));
+      r.cos=Math.abs(c)<1e-9?0:c; r.alfa=Math.acos(c)/RAD; r.W=r.N*res.d.m*r.cos/1000; }
+    res.f.push(r); });
+  return res;
+}
+function resultaten(){
+  const a=analyse(); let h='';
+  if(!a.d && !a.f.length){ $('laboRes').innerHTML='<p style="margin:0;color:var(--zacht)">Teken een kracht en een verplaatsing om te starten.</p>'; return; }
+  h+='<table class="res">';
+  if(a.d) h+=`<tr><td style="color:var(--blauw)"><b>Δx</b></td><td>${fmt(a.d.m,a.d.m%1?1:0)} m</td></tr>`;
+  else h+='<tr><td colspan="2" style="color:var(--zacht)">Nog geen verplaatsing getekend</td></tr>';
+  a.f.forEach((f,i)=>{
+    h+=`<tr><td style="color:var(--rood)"><b>F${sub(i+1)}</b></td><td>${fmt(f.N,f.N%1?0:0)} N</td></tr>`;
+    if(a.d){ const kl=Math.abs(f.W)<0.05?'nul':(f.W>0?'pos':'neg');
+      h+=`<tr><td>&nbsp;&nbsp;α</td><td>${fmt(f.alfa,1)}°</td></tr><tr><td>&nbsp;&nbsp;cos α</td><td>${fmt(f.cos,3)}</td></tr><tr><td>&nbsp;&nbsp;W${sub(i+1)}</td><td class="${kl}">${fmt(Math.abs(f.W)<0.05?0:f.W,1)} kJ</td></tr>`; }
+  });
+  h+='</table>';
+  if(a.d && a.f.length){ const t=a.f.reduce((s,f)=>s+f.W,0); const kl=Math.abs(t)<0.05?'nul':(t>0?'pos':'neg');
+    h+=`<div class="totaal ${kl}">${a.f.length>1?'Totale arbeid':'W'} = ${fmt(Math.abs(t)<0.05?0:t,1)} kJ</div>`; }
+  $('laboRes').innerHTML=h;
+}
+
+lc.addEventListener('pointerdown',e=>{ const p=canvasPunt(lc,e); lc.setPointerCapture(e.pointerId);
+  if(lTool==='wagen'){ wagenPos={x:p.x,y:snap(p.y)}; lSleep={k:'wagen'}; }
+  else if(lTool==='pen') lSleep={k:'pen',kleur:penKleur,p:[p]};
+  else { const x=snap(p.x),y=snap(p.y); lSleep={k:lTool,x1:x,y1:y,x2:x,y2:y}; }
+  tekenLabo(); });
+lc.addEventListener('pointermove',e=>{ if(!lSleep) return; const p=canvasPunt(lc,e);
+  if(lSleep.k==='wagen'){ wagenPos={x:p.x,y:snap(p.y)}; }
+  else if(lSleep.k==='pen') lSleep.p.push(p);
+  else { lSleep.x2=snap(p.x); lSleep.y2=snap(p.y); }
+  tekenLabo(); });
+lc.addEventListener('pointerup',()=>{ if(!lSleep) return; const s=lSleep; lSleep=null;
+  if(s.k==='pen'){ if(s.p.length>1) items.push(s); }
+  else if(s.k==='kracht'||s.k==='verpl'){ if(s.x1!==s.x2||s.y1!==s.y2){ if(s.k==='verpl') items=items.filter(i=>i.k!=='verpl'); items.push(s); } }
+  tekenLabo(); });
+$('lUndo').onclick=()=>{ items.pop(); tekenLabo(); };
+$('lWis').onclick=()=>{ items=[]; $('lFb').innerHTML=''; tekenLabo(); };
+$('lComp').onchange=tekenLabo; $('lWagen').onchange=tekenLabo;
+
+const UD=[
+ {t:'Teken Δx = 50 m naar rechts en een kracht die precies <b>+200 kJ</b> arbeid levert.',
+  c:a=>{ if(!a.d) return 'Teken eerst een verplaatsing.'; if(Math.abs(a.d.m-50)>0.5||hoekVerschil(a.d.rich,0)>1) return 'Δx moet 5 hokjes (50 m) horizontaal naar rechts zijn.';
+    return a.f.some(f=>Math.abs(f.W-200)<2)?true:'Nog geen kracht met W = 200 kJ. Tip: probeer 4 hokjes evenwijdig met Δx… of ontdek een schuine oplossing (4 opzij, 3 omhoog)!'; }},
+ {t:'Teken een kracht van minstens 2000 N die <b>géén arbeid</b> levert.',
+  c:a=>{ if(!a.d) return 'Zonder verplaatsing kan ik niets beslissen: teken ook Δx.'; return a.f.some(f=>f.N>=1999&&Math.abs(f.W)<0.5)?true:'Nog niet. Welke hoek moet de kracht met Δx maken?'; }},
+ {t:'Remmen: Δx = 80 m naar rechts en een remkracht die <b>−240 kJ</b> arbeid levert.',
+  c:a=>{ if(!a.d) return 'Teken eerst Δx.'; if(Math.abs(a.d.m-80)>0.5||hoekVerschil(a.d.rich,0)>1) return 'Δx moet 8 hokjes (80 m) naar rechts zijn.';
+    return a.f.some(f=>Math.abs(f.W+240)<2)?true:'Nog niet. W = F · 80 m · cos α = −240 kJ. Hoe groot moet F zijn als α = 180°?'; }},
+ {t:'Teken een kracht waarvan maar <b>ongeveer de helft</b> meetelt (F · cos α ≈ ½ F).',
+  c:a=>{ if(!a.d) return 'Teken ook Δx.'; return a.f.some(f=>Math.abs(f.cos-0.5)<=0.06)?true:'Nog niet. Bij welke hoek is cos α = 0,5? (Op het rooster lukt het bij benadering.)'; }},
+ {t:'Teken <b>twee krachten</b> die elk arbeid leveren (W ≠ 0), maar samen <b>0 J</b>.',
+  c:a=>{ if(!a.d) return 'Teken ook Δx.'; if(a.f.length<2) return 'Je hebt minstens twee krachten nodig.';
+    const t=a.f.reduce((s,f)=>s+f.W,0); if(a.f.some(f=>Math.abs(f.W)<0.5)) return 'Elke kracht moet zelf arbeid leveren (niet loodrecht).';
+    return Math.abs(t)<0.5?true:`De totale arbeid is nu ${fmt(t,1)} kJ. Pas een kracht aan zodat het precies 0 wordt.`; }}
+];
+let udIdx=0; const udK=UD.map(()=>false);
+function bouwUD(){ const c=$('uitdagingen'); c.innerHTML='';
+  UD.forEach((u,i)=>{ const d=document.createElement('div'); d.className='uitdaging'+(i===udIdx?' aan':'')+(udK[i]?' klaar':''); d.innerHTML=`<b>${i+1}.</b> ${u.t}`;
+    d.onclick=()=>{ udIdx=i; $('lFb').innerHTML=''; bouwUD(); }; c.appendChild(d); }); }
+$('lCheck').onclick=()=>{ const r=UD[udIdx].c(analyse());
+  if(r===true){ udK[udIdx]=true; $('lFb').innerHTML='<div class="ok">🏆 Uitdaging gehaald! Kies de volgende.</div>'; }
+  else $('lFb').innerHTML=`<div class="nok">${r}</div>`; bouwUD(); };
+bouwUD();
+// startvoorbeeld
+items=[{k:'verpl',x1:160,y1:400,x2:400,y2:400},{k:'kracht',x1:240,y1:240,x2:400,y2:120}];
+tekenLabo();
+document.fonts && document.fonts.ready.then(()=>{ tekenScene(); tekenLabo(); });
+</script>
+</body>
+</html>
